@@ -15,9 +15,9 @@ flags.DEFINE_integer('batch_size', 100, 'Training batch size ')
 flags.DEFINE_float('learning_rate', 0.01, 'Learning rate')
 # 定义分布式参数
 # 参数服务器parameter server节点
-flags.DEFINE_string('ps_hosts', 'storage04.maas:22221', 'Comma-separated list of hostname:port pairs')
+flags.DEFINE_string('ps_hosts', '192.168.32.145:22221', 'Comma-separated list of hostname:port pairs')
 # 两个worker节点
-flags.DEFINE_string('worker_hosts', 'storage03.maas:22221,cpu14.maas:22221',
+flags.DEFINE_string('worker_hosts', '192.168.32.146:22221,192.168.32.160:22221',
                     'Comma-separated list of hostname:port pairs')
 # 设置job name参数
 flags.DEFINE_string('job_name', None, 'job name: worker or ps')
@@ -35,11 +35,11 @@ def main(unused_argv):
     if FLAGS.job_name is None or FLAGS.job_name == '':
         raise ValueError('Must specify an explicit job_name !')
     else:
-        print('job_name : %s' % FLAGS.job_name)
+        print 'job_name : %s' % FLAGS.job_name
     if FLAGS.task_index is None or FLAGS.task_index == '':
         raise ValueError('Must specify an explicit task_index!')
     else:
-        print('task_index : %d' % FLAGS.task_index)
+        print 'task_index : %d' % FLAGS.task_index
 
     ps_spec = FLAGS.ps_hosts.split(',')
     worker_spec = FLAGS.worker_hosts.split(',')
@@ -47,7 +47,7 @@ def main(unused_argv):
     # 创建集群
     num_worker = len(worker_spec)
     cluster = tf.train.ClusterSpec({'ps': ps_spec, 'worker': worker_spec})
-    server = tf.train.Server(cluster, protocol='grpc+verbs',  job_name=FLAGS.job_name, task_index=FLAGS.task_index)
+    server = tf.train.Server(cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
     if FLAGS.job_name == 'ps':
         server.join()
 
@@ -85,14 +85,14 @@ def main(unused_argv):
                                  global_step=global_step)
 
         if is_chief:
-            print('Worker %d: Initailizing session...' % FLAGS.task_index)
+            print 'Worker %d: Initailizing session...' % FLAGS.task_index
         else:
-            print('Worker %d: Waiting for session to be initaialized...' % FLAGS.task_index)
+            print 'Worker %d: Waiting for session to be initaialized...' % FLAGS.task_index
         sess = sv.prepare_or_wait_for_session(server.target)
-        print('Worker %d: Session initialization  complete.' % FLAGS.task_index)
+        print 'Worker %d: Session initialization  complete.' % FLAGS.task_index
 
         time_begin = time.time()
-        print('Traing begins @ %f' % time_begin)
+        print 'Traing begins @ %f' % time_begin
 
         local_step = 0
         while True:
@@ -103,19 +103,19 @@ def main(unused_argv):
             local_step += 1
 
             now = time.time()
-            print('%f: Worker %d: traing step %d dome (global step:%d)' % (now, FLAGS.task_index, local_step, step))
+            print '%f: Worker %d: traing step %d dome (global step:%d)' % (now, FLAGS.task_index, local_step, step)
 
             if step >= FLAGS.train_steps:
                 break
 
         time_end = time.time()
-        print('Training ends @ %f' % time_end)
+        print 'Training ends @ %f' % time_end
         train_time = time_end - time_begin
-        print('Training elapsed time:%f s' % train_time)
+        print 'Training elapsed time:%f s' % train_time
 
         val_feed = {x: mnist.validation.images, y_: mnist.validation.labels}
         val_xent = sess.run(cross_entropy, feed_dict=val_feed)
-        print('After %d training step(s), validation cross entropy = %g' % (FLAGS.train_steps, val_xent))
+        print 'After %d training step(s), validation cross entropy = %g' % (FLAGS.train_steps, val_xent)
     sess.close()
 
 if __name__ == '__main__':
