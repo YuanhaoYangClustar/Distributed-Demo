@@ -20,14 +20,14 @@ NUM_LABELS = 1000
 LEARNING_RATE = 0.1
 
 # Flags for defining the tf.train.ClusterSpec
-tf.app.flags.DEFINE_string("ps_hosts", "",
+tf.app.flags.DEFINE_string("ps_hosts", "cpu14.maas:22221",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker_hosts", "",
+tf.app.flags.DEFINE_string("worker_hosts", "storage03.maas:22221,storage04.maas:22221",
                            "Comma-separated list of hostname:port pairs")
 
 # Flags for defining the tf.train.Server
 tf.app.flags.DEFINE_string("job_name", "", "One of 'ps', 'worker'")
-tf.app.flags.DEFINE_integer("task_id", 0, "Index of task within the job")
+tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 
 tf.app.flags.DEFINE_integer('batch_size', 256,
                             """Batch size.""")
@@ -97,9 +97,9 @@ def get_graph():
         # Relu
         relu = tf.nn.relu(bias, name=scope)
         # Response normalization
-        radius = 2;
-        alpha = 2e-05;
-        beta = 0.75;
+        radius = 2
+        alpha = 2e-05
+        beta = 0.75
         bias = 1.0
         lrn = tf.nn.local_response_normalization(relu,
                                                  depth_radius=radius,
@@ -156,10 +156,10 @@ def get_graph():
         relu = tf.nn.relu(bias, name='relu5')
         # Max pool
         # max_pool(3, 3, 2, 2, padding='VALID', name='pool5')
-        k_h = 3;
-        k_w = 3;
-        s_h = 2;
-        s_w = 2;
+        k_h = 3
+        k_w = 3
+        s_h = 2
+        s_w = 2
         padding = 'VALID'
 
         maxpool5 = tf.nn.max_pool(relu, ksize=[1, k_h, k_w, 1], strides=[1, s_h, s_w, 1], padding=padding)
@@ -190,6 +190,8 @@ def get_graph():
 def main(_):
     ps_hosts = FLAGS.ps_hosts.split(",")
     worker_hosts = FLAGS.worker_hosts.split(",")
+    print("______________________")
+    print(worker_hosts)
 
     batch_size = FLAGS.batch_size
 
@@ -197,9 +199,7 @@ def main(_):
     cluster = tf.train.ClusterSpec({"ps": ps_hosts, "worker": worker_hosts})
 
     # Create and start a server for the local task.
-    server = tf.train.Server(cluster,
-                             job_name=FLAGS.job_name,
-                             task_index=FLAGS.task_id)
+    server = tf.train.Server(cluster, protocol='grpc+verbs', job_name=FLAGS.job_name, task_index=FLAGS.task_index)
 
     if FLAGS.job_name == "ps":
         server.join()
@@ -207,10 +207,8 @@ def main(_):
 
         # Assigns ops to the local worker by default.
         with tf.device(tf.train.replica_device_setter(
-                worker_device="/job:worker/task:%d" % FLAGS.task_id,
+                worker_device="/job:worker/task:%d" % FLAGS.task_index,
                 cluster=cluster)):
-
-            summary_op = tf.merge_all_summaries()
 
             y, x = get_graph()
 
@@ -224,7 +222,7 @@ def main(_):
 
             num_workers = len(worker_hosts)
             sync_rep_opt = tf.train.SyncReplicasOptimizer(gradient_descent_opt, replicas_to_aggregate=num_workers,
-                                                          replica_id=FLAGS.task_id, total_num_replicas=num_workers)
+                                                          total_num_replicas=num_workers)
 
             train_op = sync_rep_opt.minimize(cross_entropy, global_step=global_step)
 
@@ -232,15 +230,15 @@ def main(_):
             chief_queue_runner = sync_rep_opt.get_chief_queue_runner()
 
             # saver = tf.train.Saver()
-            summary_op = tf.merge_all_summaries()
+            summary_op = tf.summary.merge_all()
 
             init_op = tf.initialize_all_variables()
             saver = tf.train.Saver()
 
-        is_chief = (FLAGS.task_id == 0)
+        is_chief = (FLAGS.task_index == 0)
 
         # Create a "supervisor", which oversees the training process.
-        sv = tf.train.Supervisor(is_chief=(FLAGS.task_id == 0),
+        sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
                                  init_op=init_op,
                                  summary_op=summary_op,
                                  saver=saver,
@@ -255,8 +253,8 @@ def main(_):
                 sess.run(init_token_op)
 
             num_steps_burn_in = 10
-            total_duration = 0
-            total_duration_squared = 0
+            # total_duration = 0
+            # total_duration_squared = 0
 
             step = 0
             while step <= 2000:
@@ -276,7 +274,7 @@ def main(_):
 
                 if step > num_steps_burn_in:
                     print(format_str %
-                          (FLAGS.task_id, datetime.now(), step,
+                          (FLAGS.task_index, datetime.now(), step,
                            examples_per_sec, duration))
                     sys.stdout.flush()
                 else:
