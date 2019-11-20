@@ -1,1 +1,1 @@
- scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.209:/home/yuanhao && scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.111:/home/yuanhao && scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.211:/home/yuanhao
+ scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.209:/home/yuanhao && scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.208:/home/yuanhao && scp -i ../yyhyplxyz Distributed_Alexnet.py yuanhao@172.17.255.211:/home/yuanhao

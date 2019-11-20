@@ -10,6 +10,7 @@ import math
 import time
 import sys
 import numpy as np
+from tensorflow.examples.tutorials.mnist import input_data
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
@@ -20,9 +21,9 @@ NUM_LABELS = 1000
 LEARNING_RATE = 0.1
 
 # Flags for defining the tf.train.ClusterSpec
-tf.app.flags.DEFINE_string("ps_hosts", "cpu14.maas:22221",
+tf.app.flags.DEFINE_string("ps_hosts", "storage03.maas:22221",
                            "Comma-separated list of hostname:port pairs")
-tf.app.flags.DEFINE_string("worker_hosts", "storage03.maas:22221,storage04.maas:22221",
+tf.app.flags.DEFINE_string("worker_hosts", "storage02.maas:22221,storage04.maas:22221",
                            "Comma-separated list of hostname:port pairs")
 
 # Flags for defining the tf.train.Server
@@ -31,6 +32,7 @@ tf.app.flags.DEFINE_integer("task_index", 0, "Index of task within the job")
 
 tf.app.flags.DEFINE_integer('batch_size', 256,
                             """Batch size.""")
+tf.app.flags.DEFINE_string('data_dir', '/tmp/mnist-data', 'Directory  for storing mnist data')
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -192,7 +194,7 @@ def main(_):
     worker_hosts = FLAGS.worker_hosts.split(",")
     print("______________________")
     print(worker_hosts)
-
+    # mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
     batch_size = FLAGS.batch_size
 
     # Create a cluster from the parameter server and worker hosts.
@@ -236,13 +238,15 @@ def main(_):
             saver = tf.train.Saver()
 
         is_chief = (FLAGS.task_index == 0)
+        train_dir = tempfile.mkdtemp()
 
         # Create a "supervisor", which oversees the training process.
         sv = tf.train.Supervisor(is_chief=(FLAGS.task_index == 0),
                                  init_op=init_op,
                                  summary_op=summary_op,
                                  saver=saver,
-                                 global_step=global_step)
+                                 global_step=global_step,
+                                 logdir=train_dir)
 
         # The supervisor takes care of session initialization, restoring from
         # a checkpoint, and closing when done or an error occurs.
@@ -272,6 +276,7 @@ def main(_):
                 format_str = ('Worker %d: %s: step %d, loss = NA'
                               '(%.1f examples/sec; %.3f  sec/batch)')
 
+
                 if step > num_steps_burn_in:
                     print(format_str %
                           (FLAGS.task_index, datetime.now(), step,
@@ -281,6 +286,9 @@ def main(_):
                     print('Not considering step %d (%.1f samples/sec)' %
                           (step, examples_per_sec))
                     sys.stdout.flush()
+                # val_feed = {x: mnist.validation.images, y_: mnist.validation.labels}
+                # val_xent = sess.run(cross_entropy, feed_dict=val_feed)
+                # print('After %d training step(s), validation cross entropy = %g' % (FLAGS.train_steps, val_xent))
 
         sv.stop()
 
