@@ -201,6 +201,7 @@ def setup_cmd_argument(parser):
 
 if __name__ == '__main__':
     os.environ["TF_CONFIG"] = json.dumps({
+    "rpc_layer":"grpc+gdr",
     "cluster": {
         "worker": ["storage03.maas:10088", "storage04.maas:10088"],
         "ps": ["cpu14.maas:10088"]
