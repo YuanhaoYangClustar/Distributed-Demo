@@ -2,6 +2,8 @@ import gzip
 import shutil
 import argparse
 import tensorflow as tf
+import os
+import json
 
 
 def create_model(data_format):
@@ -200,8 +202,8 @@ def setup_cmd_argument(parser):
 if __name__ == '__main__':
     os.environ["TF_CONFIG"] = json.dumps({
     "cluster": {
-        "worker": ["host1:port", "host2:port", "host3:port"],
-        "ps": ["host4:port", "host5:port"]
+        "worker": ["storage03.maas:10088", "storage04.maas:10088"],
+        "ps": ["cpu14.maas:10088"]
     },
    "task": {"type": "worker", "index": 1}
 })
