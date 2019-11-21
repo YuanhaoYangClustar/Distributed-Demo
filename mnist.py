@@ -203,8 +203,8 @@ if __name__ == '__main__':
     os.environ["TF_CONFIG"] = json.dumps({
     "rpc_layer":"grpc+gdr",
     "cluster": {
-        "worker": ["storage03.maas:10088", "storage04.maas:10088"],
-        "ps": ["cpu14.maas:10088"]
+        "worker": ["10.11.5.255", "10.11.6.255", "10.11.255.255"],
+        # "ps": ["10.11.255.255"]
     },
    "task": {"type": "worker", "index": 1}
 })
