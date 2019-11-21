@@ -18,16 +18,16 @@ for module in mpl, np, pd, sklearn, tf, keras:
     print(module.__name__, module.__version__)
 
 
-tf_config = os.environ.get('TF_CONFIG')
-print("The tf config is " + tf_config)
-
-tf.debugging.set_log_device_placement(True)
-cpus = tf.config.experimental.list_physical_devices('CPU')
-for cpu in cpus:
-    tf.config.experimental.set_memory_growth(cpu, True)
-print(len(cpus))
-logical_cpus = tf.config.experimental.list_logical_devices('CPU')
-print(len(logical_cpus))
+# tf_config = os.environ.get('TF_CONFIG')
+# print("The tf config is " + tf_config)
+#
+# tf.debugging.set_log_device_placement(True)
+# cpus = tf.config.experimental.list_physical_devices('CPU')
+# for cpu in cpus:
+#     tf.config.experimental.set_memory_growth(cpu, True)
+# print(len(cpus))
+# logical_cpus = tf.config.experimental.list_logical_devices('CPU')
+# print(len(logical_cpus))
 
 
 
