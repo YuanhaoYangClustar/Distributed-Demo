@@ -55,7 +55,8 @@ def model_fn(features, labels, mode):
     loss = tf.reduce_sum(loss) * (1. / BATCH_SIZE)
     if mode == tf.estimator.ModeKeys.EVAL:
         return tf.estimator.EstimatorSpec(mode, loss=loss)
-
+    print("loss is ")
+    print(loss)
     return tf.estimator.EstimatorSpec(
         mode=mode,
         loss=loss,
