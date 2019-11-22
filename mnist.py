@@ -208,7 +208,7 @@ if __name__ == '__main__':
 #     },
 #    "task": {"type": "worker", "index": 1}
 # })
-    del os.environ['TF_CONFIG']
+    #del os.environ['TF_CONFIG']
     tf.logging.set_verbosity(tf.logging.INFO)
     # setup command line argument and parse it.
     parser = argparse.ArgumentParser(
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         'learning_rate': args.lr
     }
 
-    distribute = tf.contrib.distribute.CollectiveAllReduceStrategy()
+    distribute = tf.contrib.distribute.MirroredStrategy()
     run_config = tf.estimator.RunConfig(
         model_dir='/tmp/mnist/',
         train_distribute=distribute)
