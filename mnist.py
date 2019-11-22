@@ -208,6 +208,7 @@ if __name__ == '__main__':
 #     },
 #    "task": {"type": "worker", "index": 1}
 # })
+    os.environ['TF_CONFIG'] = None
     tf.logging.set_verbosity(tf.logging.INFO)
     # setup command line argument and parse it.
     parser = argparse.ArgumentParser(
