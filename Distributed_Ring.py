@@ -51,7 +51,7 @@ def model_fn(features, labels, mode):
     optimizer = tf.compat.v1.train.GradientDescentOptimizer(
         learning_rate=LEARNING_RATE)
     loss = tf.keras.losses.sparse_categorical_crossentropy(
-        from_logits=True, reduction=tf.keras.losses.Reduction.NONE)(labels, logits)
+        from_logits=True)(labels, logits)
     loss = tf.reduce_sum(loss) * (1. / BATCH_SIZE)
     if mode == tf.estimator.ModeKeys.EVAL:
         return tf.estimator.EstimatorSpec(mode, loss=loss)
