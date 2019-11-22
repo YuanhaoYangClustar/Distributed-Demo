@@ -200,14 +200,14 @@ def setup_cmd_argument(parser):
 
 
 if __name__ == '__main__':
-    os.environ["TF_CONFIG"] = json.dumps({
-    "rpc_layer":"grpc+gdr",
-    "cluster": {
-        "worker": ["10.11.5.2:20000", "10.11.4.2:20000", "10.11.0.2:20000"], # storage03, storage02, cpu14
-        # "ps": ["10.11.255.255"]
-    },
-   "task": {"type": "worker", "index": 1}
-})
+#     os.environ["TF_CONFIG"] = json.dumps({
+#     "rpc_layer":"grpc+gdr",
+#     "cluster": {
+#         "worker": ["10.11.5.2:20000", "10.11.4.2:20000", "10.11.0.2:20000"], # storage03, storage02, cpu14
+#         # "ps": ["10.11.255.255"]
+#     },
+#    "task": {"type": "worker", "index": 1}
+# })
     tf.logging.set_verbosity(tf.logging.INFO)
     # setup command line argument and parse it.
     parser = argparse.ArgumentParser(
