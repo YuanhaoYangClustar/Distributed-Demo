@@ -63,7 +63,7 @@ def model_fn(features, labels, mode):
             loss, tf.compat.v1.train.get_or_create_global_step()))
 
 
-strategy = tf.contrib.distribute.MultiWorkerMirroredStrategy()
+strategy = tf.contrib.distribute.CollectiveAllReduceStrategy()
 
 config = tf.estimator.RunConfig(train_distribute=strategy)
 
