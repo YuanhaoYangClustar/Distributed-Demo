@@ -5,12 +5,12 @@ import os, json
 BUFFER_SIZE = 10000
 BATCH_SIZE = 64
 
-os.environ['TF_CONFIG'] = json.dumps({
-    'cluster': {
-        "worker": ["10.11.5.2:20000"]
-    },
-    'task': {'type': 'worker', 'index': 0}
-})
+# os.environ['TF_CONFIG'] = json.dumps({
+#     'cluster': {
+#         "worker": ["10.11.4.2:20000", "10.11.0.2:20000"]
+#     },
+#     'task': {'type': 'worker', 'index': 0}
+# })
 
 
 def input_fn(mode, input_context=None):
