@@ -200,15 +200,15 @@ def setup_cmd_argument(parser):
 
 
 if __name__ == '__main__':
-#     os.environ["TF_CONFIG"] = json.dumps({
-#     "rpc_layer":"grpc+gdr",
-#     "cluster": {
-#         "worker": ["10.11.5.2:20000", "10.11.4.2:20000", "10.11.0.2:20000"], # storage03, storage02, cpu14
-#         # "ps": ["10.11.255.255"]
-#     },
-#    "task": {"type": "worker", "index": 1}
-# })
-    #del os.environ['TF_CONFIG']
+    os.environ["TF_CONFIG"] = json.dumps({
+    "rpc_layer":"grpc+gdr",
+    "cluster": {
+        "worker": ["10.11.5.2:20000", "10.11.4.2:20000", "10.11.0.2:20000"], # storage03, storage02, cpu14
+        # "ps": ["10.11.255.255"]
+    },
+   "task": {"type": "worker", "index": 1}
+})
+    del os.environ['TF_CONFIG']
     tf.logging.set_verbosity(tf.logging.INFO)
     # setup command line argument and parse it.
     parser = argparse.ArgumentParser(
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         'learning_rate': args.lr
     }
 
-    distribute = tf.contrib.distribute.MirroredStrategy()
+    distribute = tf.contrib.distribute.CollectiveAllReduceStrategy()
     run_config = tf.estimator.RunConfig(
         model_dir='/tmp/mnist/',
         train_distribute=distribute)
