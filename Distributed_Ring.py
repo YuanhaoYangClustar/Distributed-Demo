@@ -7,7 +7,7 @@ BATCH_SIZE = 64
 
 os.environ['TF_CONFIG'] = json.dumps({
     'cluster': {
-        'worker': ["localhost:12345", "localhost:23456"]
+        "worker": ["10.11.4.2:20000", "10.11.0.2:20000"]
     },
     'task': {'type': 'worker', 'index': 0}
 })
